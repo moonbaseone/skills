@@ -1,0 +1,13 @@
+{
+  "name": "@wookosh/agent-skills",
+  "private": true,
+  "type": "module",
+  "description": "Shared Cursor and Claude Code agent skills",
+  "scripts": {
+    "install-skills": "node scripts/install-skills.mjs",
+    "list-skills": "node scripts/install-skills.mjs --list"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
