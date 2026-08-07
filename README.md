@@ -11,8 +11,9 @@ Shared **Cursor** and **Claude Code** skills for multiple repositories. Each ski
 | **`git-pr`** | Create/list/view **pull requests** (e.g. `gh pr create`), title/body confirmation |
 | **`log-adr`** | Capture major technical decisions from chat; interactive **APPROVE/ALTER/SKIP/OTHER**; write `docs/adr/NNNN-title.md` and update `docs/adr/index.md` |
 | **`bmad-archive-history`** | Archive gitignored `_bmad-output/` into `docs/delivery/` at milestones; Option B routing (`docs/planning-artifacts/` = pre-epic spikes only); conflict-minimal workstream folders |
+| **`manual-review`** | Paired human–AI walkthrough of AI-generated code in gated, bite-size chunks; complements automated review (e.g. `bmad-code-review`); writes a review record to `docs/reviews/` |
 
-**Routing:** Point agents (or a Cursor rule) so “commit / stage / message” loads **`git-commit`**, “push / publish branch” loads **`git-push`**, “open a PR / review request” loads **`git-pr`**, “ADR / decision log / record architecture decision” loads **`log-adr`**, “archive BMAD history / snapshot epic / publish delivery history” loads **`bmad-archive-history`**.
+**Routing:** Point agents (or a Cursor rule) so “commit / stage / message” loads **`git-commit`**, “push / publish branch” loads **`git-push`**, “open a PR / review request” loads **`git-pr`**, “ADR / decision log / record architecture decision” loads **`log-adr`**, “archive BMAD history / snapshot epic / publish delivery history” loads **`bmad-archive-history`**, “manual review / walk me through the code / paired review” loads **`manual-review`**.
 
 ## Layout (this repository)
 
@@ -35,6 +36,10 @@ bmad-archive-history/
     epic-summary.md
     journal-entry.md
     workstream-readme.md
+manual-review/
+  SKILL.md
+  templates/
+    session-state.md
 ```
 
 Add more skills by adding sibling folders with their own `SKILL.md` and YAML frontmatter (`name`, `description`).
