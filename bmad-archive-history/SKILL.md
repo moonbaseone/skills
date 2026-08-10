@@ -3,12 +3,14 @@ name: bmad-archive-history
 description: >-
   Archives BMAD planning and implementation artifacts from gitignored
   _bmad-output/ into committed docs/delivery/ at milestone boundaries (epic
-  done, pause point, course correction). Uses Option B — docs/planning-artifacts/
-  for cross-cutting pre-epic spikes only; epic/story content under
+  done, pause point, course correction) and for done non-epic change specs
+  (bugfix/feature/refactor/chore). Uses Option B — docs/planning-artifacts/
+  for cross-cutting pre-epic spikes only; epic/story and changes/ content under
   docs/delivery/. Minimizes git merge conflicts via workstream folders and
   immutable snapshots. Use when the user asks to archive BMAD history,
-  publish delivery history, migrate _bmad-output to docs, snapshot sprint
-  status, or codify how we got here for other devs and agents.
+  publish delivery history, archive a done change spec, migrate _bmad-output
+  to docs, snapshot sprint status, or codify how we got here for other
+  devs and agents.
 ---
 
 # BMAD archive history (BMAD → docs)
@@ -24,15 +26,25 @@ You help the user **publish immutable delivery history** from local BMAD workspa
 | **Technical decisions** | `docs/adr/` | committed | Durable architecture decisions — use **`log-adr`** skill, not delivery archive |
 | **Pre-epic spikes** | `docs/planning-artifacts/` | committed | **Option B** — cross-cutting spikes only (see **Routing** below) |
 
-**Rule:** Nothing under `docs/delivery/` is BMAD’s live source of truth. Publish **once at milestones**; do not sync ongoing edits from `_bmad-output/`.
+**Rule:** Nothing under `docs/delivery/` is BMAD’s live source of truth. Publish **once at milestones** (or when a non-epic change ships); do not sync ongoing edits from `_bmad-output/`.
 
-**After publish:** Detailed **done** story files and other copied Tier A/B artifacts must **not** remain in `_bmad-output/` — prune them so history lives only under `docs/delivery/` (see **Prune BMAD duplicates**).
+**After publish:** Detailed **done** story files, **done** change specs, and other copied Tier A/B/Q artifacts must **not** remain in `_bmad-output/` — prune them so history lives only under `docs/delivery/` (see **Prune BMAD duplicates**).
+
+## Publish modes
+
+| Mode | When | Scope |
+|------|------|--------|
+| **MILESTONE** (default) | Epic done, pause point, course correction | Epics, stories, sprint-status snapshot, planning Tier D, journal |
+| **CHANGES** | Done non-epic specs (`spec-*.md` with `status: done`) after merge / ship | `changes/` copies + index; no epic/sprint-status snapshot unless user asks |
+
+Ask which mode if ambiguous. **CHANGES** is the lightweight path — do not require a full epic publish plan.
 
 ## Routing (Option B)
 
 | Content | Destination |
 |---------|-------------|
-| Has **epic/story ID** (`6-3-…`, `epic-6`, sprint change tied to delivery) | `docs/delivery/workstreams/<workstream>/…` |
+| Has **epic/story ID** (`6-3-…`, `epic-6`, sprint change tied to delivery) | `docs/delivery/workstreams/<workstream>/…` (usually `epics/`) |
+| **Done non-epic change spec** (`spec-*.md`, `status: done`) | `docs/delivery/workstreams/<workstream>/changes/` |
 | **Cross-cutting spike** with no epic yet (HTTP client draft, feasibility study) | `docs/planning-artifacts/` |
 | **Technical decision** with alternatives and consequences | `docs/adr/` via **`log-adr`** |
 | **Living** `sprint-status.yaml`, `epics.md` in `_bmad-output/` | **Never commit** as updatable files |
@@ -59,20 +71,20 @@ docs/
               N-N-story-slug.md     # immutable copies from _bmad-output
             reviews/
               epic-N-code-review.md
+        changes/                    # non-epic shipped work (bugfix, feature, …)
+          README.md                 # index table
+          YYYY-MM-DD-<type>-<slug>.md
         course-corrections/
           YYYY-MM-DD-<topic>.md
         retrospectives/
           epic-N-YYYY-MM-DD.md
         planning-snapshots/
           YYYY-MM-DD-<milestone>/
-            epics-excerpt.md        # FR inventory + epic narrative — not full living epics.md
-            planning/               # immutable copies from _bmad-output/planning-artifacts/
-              README.md             # index of snapshotted planning files
-              product-brief-*.md
-              architecture.md
-              ux-design-specification.md
+            epics-excerpt.md
+            planning/
+              README.md
               …
-            brainstorming/          # optional: sessions tied to this workstream
+            brainstorming/
         ux-reference/
           *.html
         deferred/
@@ -83,22 +95,35 @@ docs/
 
 **Workstream slug:** lowercase kebab-case from **product area** (e.g. `regulations-admin`, `pool-designer`), not developer name.
 
+**`changes/` naming (mandatory):** archived filename is `YYYY-MM-DD-<type>-<slug>.md` where:
+
+- `<type>` is the spec frontmatter `type` exactly: `feature` \| `bugfix` \| `refactor` \| `chore`
+- `<slug>` is the live filename without the `spec-` prefix (e.g. `spec-gh-76-no-pump-warning-noop.md` → slug `gh-76-no-pump-warning-noop`)
+- Date is archive day (or frontmatter `created` if the user prefers — ask once if unclear)
+
+Example: `2026-08-10-bugfix-gh-76-no-pump-warning-noop.md`
+
+**HALT** if `type` is missing or not one of the four allowed values — do not invent a default.
+
+Do **not** name this folder after a BMAD skill (e.g. avoid `quick-dev/`). `changes/` is delivery vocabulary: work that shipped outside the epic/story tree.
+
 ## When to apply this skill
 
 - User says: “publish delivery history”, “archive BMAD”, “migrate _bmad-output to docs”, “snapshot epic N”, “pause point archive”.
+- User says: “archive change spec”, “publish done spec”, “archive GH-76 / this bugfix”, or similar after a non-epic ship.
 - An **epic is done**, a **pause point** is reached, or a **significant course correction** should be recorded.
 - User wants agents to understand delivery context without reading gitignored files.
 
-**Do not apply** for: active story implementation (stay in `_bmad-output/`), ADR logging (**`log-adr`**), or routine commits of application code.
+**Do not apply** for: active story or in-progress spec implementation (stay in `_bmad-output/`), ADR logging (**`log-adr`**), or routine commits of application code. Prefer archiving **CHANGES** after the fix is merged (or the user confirms ship), not mid-branch.
 
 ## Conflict-minimization rules (mandatory)
 
 1. **New files at publish time** — no shared mutable `sprint-status.yaml` or `epics.md` in git.
 2. **One folder per completed epic** — parallel devs on different epics rarely touch the same path.
 3. **Separate workstream folders** — each dev publishes under their product workstream at **their** milestones.
-4. **Append-only journal** — add entries at the **bottom** of `timeline/journal.md`.
-5. **Date-prefixed filenames** for course corrections and snapshots (`2026-06-02-ispsc-occupancy-model-fix.md`).
-6. **Never re-archive in place** — if a story copy was wrong, add `…-amended-YYYY-MM-DD.md`; do not edit archived copies.
+4. **Append-only journal** — add entries at the **bottom** of `timeline/journal.md` (milestone mode). For **CHANGES**, default to updating `changes/README.md` only; journal one-liners only if the user asks or at a later pause-point batch.
+5. **Date-prefixed filenames** for course corrections, snapshots, and change archives.
+6. **Never re-archive in place** — if a copy was wrong, add `…-amended-YYYY-MM-DD.md`; do not edit archived copies.
 7. Optional: write `.published` in the workstream with ISO date + git SHA of the code snapshot.
 
 ## Content tiers
@@ -152,17 +177,41 @@ When a **workstream milestone** completes (e.g. Epics 1–6 done), copy then **d
 
 **Do not confuse with `docs/planning-artifacts/` (Option B):** repo-committed **pre-epic spikes** with no story IDs stay there; workstream planning that went through BMAD lives under **delivery** `planning-snapshots/`, not `docs/planning-artifacts/`.
 
+### Tier Q — non-epic change specs (CHANGES mode)
+
+| Source in `_bmad-output/` | Destination |
+|---------------------------|-------------|
+| `implementation-artifacts/spec-*.md` with frontmatter `status: done` | `changes/YYYY-MM-DD-<type>-<slug>.md` |
+
+**Workflow (CHANGES mode only):**
+
+1. Resolve **project root**, **workstream slug**, and which done `spec-*.md` files are in scope (user list, or all `status: done` not yet archived).
+2. For each spec: read frontmatter; validate `type` ∈ `{feature, bugfix, refactor, chore}`; derive archive filename.
+3. Present the **CHANGES publish plan** (below); **HALT** for APPROVE / ALTER / SKIP.
+4. On APPROVE:
+   - Ensure `docs/delivery/workstreams/<slug>/changes/` exists.
+   - Create `changes/README.md` from **`templates/changes-readme.md`** if missing.
+   - Copy each spec body to the typed archive name. Optionally enrich frontmatter with `archived: YYYY-MM-DD`, `issue`, `pr`, `commit` — **do not** rewrite content inside `<frozen-after-approval>`.
+   - Append/update a row in `changes/README.md` (date, type, title, links).
+   - Journal: **skip** unless user requested a one-liner.
+5. Prune copied `spec-*.md` from `_bmad-output/implementation-artifacts/` unless **KEEP_BMAD**.
+6. Record pruned paths on workstream `.published` when that file exists.
+
+**Do not** run Tier D planning prune or rewrite `sprint-status.yaml` in CHANGES mode unless the user explicitly expands scope to a milestone publish.
+
 ### UX / HTML mockups
 
 Copy referenced mockups to `ux-reference/` when agents need them for context; skip unused drafts.
 
 ## Review dialog (mandatory before writing)
 
+### MILESTONE mode
+
 Present a **publish plan**, then **stop and wait** for user input.
 
 ```
 ════════════════════════════════════════════════════════════
-DELIVERY PUBLISH — Plan
+DELIVERY PUBLISH — Plan (MILESTONE)
 ════════════════════════════════════════════════════════════
 Workstream:     [slug]
 Milestone:      [e.g. Epic 6 complete / pause point]
@@ -175,6 +224,7 @@ Will create/update:
   - docs/delivery/workstreams/[slug]/timeline/[date]-[label].yaml
   - docs/delivery/workstreams/[slug]/epics/epic-[NN]/… ([N] stories, [N] summaries)
   - [list course-corrections, retros, ux files]
+  - [optional] changes/ rows if bundling done specs into this milestone
 
 Will snapshot + prune from _bmad-output/planning-artifacts/ (Tier D; reply KEEP_BMAD to skip):
   - product-brief, architecture, ux-design-specification, types-object-model,
@@ -184,6 +234,7 @@ Will snapshot + prune from _bmad-output/planning-artifacts/ (Tier D; reply KEEP_
 
 Will prune from _bmad-output/implementation-artifacts/:
   - {story-key}.md, epic_*_CODE_REVIEW.md, epic-*-retro-*.md, *.html mockups (after delivery copy)
+  - [optional] spec-*.md copied into changes/
 
 Will keep in _bmad-output (living BMAD only):
   - implementation-artifacts/sprint-status.yaml, deferred-work.md (new deferrals only)
@@ -203,9 +254,46 @@ Reply with one of:
 ════════════════════════════════════════════════════════════
 ```
 
-On **APPROVE**, execute the checklist below.
+### CHANGES mode
 
-## Publish workflow
+```
+════════════════════════════════════════════════════════════
+DELIVERY PUBLISH — Plan (CHANGES)
+════════════════════════════════════════════════════════════
+Workstream:     [slug]
+Snapshot date:  YYYY-MM-DD
+Source:         _bmad-output/implementation-artifacts/
+
+Specs to archive:
+  - spec-[slug].md → changes/YYYY-MM-DD-[type]-[slug].md
+    title: […]
+    type:  [feature|bugfix|refactor|chore]
+    issue/PR/commit: [if known]
+
+Will create/update:
+  - docs/delivery/workstreams/[slug]/changes/README.md
+  - docs/delivery/workstreams/[slug]/changes/[dated-typed files]
+  - journal: [skip | one-line — default skip]
+
+Will prune from _bmad-output/implementation-artifacts/:
+  - matching spec-*.md (after delivery copy)
+
+Will NOT:
+  - Touch epics/, sprint-status snapshots, or planning Tier D
+  - Commit living BMAD paths
+
+Reply with one of:
+  APPROVE      — Execute the plan
+  ALTER        — Revise plan from my feedback; re-show until satisfied
+  SKIP         — Do not write files
+  KEEP_BMAD    — Archive to docs/delivery but leave live copies in _bmad-output/
+
+════════════════════════════════════════════════════════════
+```
+
+On **APPROVE**, execute the matching checklist below.
+
+## Publish workflow (MILESTONE)
 
 ### 1. Resolve context
 
@@ -274,9 +362,9 @@ Copy retros, course corrections (rename with date prefix), deferred-work, ux-ref
 
 #### 9a. `implementation-artifacts/`
 
-1. **Delete** each file copied in steps 3–5 (stories, reviews, retros, html mockups).
+1. **Delete** each file copied in steps 3–5 (stories, reviews, retros, html mockups) and any Tier Q specs bundled into this milestone.
 2. Update live `sprint-status.yaml`: published epics → `done`; optional removal of per-story keys for pruned stories.
-3. Write `_bmad-output/implementation-artifacts/README.md` pointing to `docs/delivery/workstreams/<slug>/` (stories, reviews, deferred snapshot).
+3. Write `_bmad-output/implementation-artifacts/README.md` pointing to `docs/delivery/workstreams/<slug>/` (stories, reviews, changes, deferred snapshot).
 
 #### 9b. `planning-artifacts/` (Tier D)
 
@@ -306,21 +394,33 @@ This folder keeps **epics.md** (next-epic backlog). Re-run planning workflows (`
 
 1. Append all deleted paths to workstream `.published` under `pruned_from_bmad_output:`.
 2. **Stories:** `bmad-create-story` / `bmad-dev-story` → `docs/delivery/.../stories/`.
-3. **Planning:** `bmad-create-epics-and-stories`, `bmad-check-implementation-readiness` → `planning-snapshots/…/planning/` for prior workstream context, not `_bmad-output/planning-artifacts/`.
+3. **Non-epic change specs:** load from `docs/delivery/.../changes/` after archive.
+4. **Planning:** `bmad-create-epics-and-stories`, `bmad-check-implementation-readiness` → `planning-snapshots/…/planning/` for prior workstream context, not `_bmad-output/planning-artifacts/`.
 
-**Do not prune:** `project-context.md`, `sprint-status.yaml`, in-progress story files outside scope, or `docs/planning-artifacts/` Option B spikes (separate path).
+**Do not prune:** `project-context.md`, `sprint-status.yaml`, in-progress story/spec files outside scope, or `docs/planning-artifacts/` Option B spikes (separate path).
 
 ## After writing
 
-Report:
+### MILESTONE
 
 ```
-✅ Delivery history published
+✅ Delivery history published (MILESTONE)
    Workstream: docs/delivery/workstreams/[slug]/
    Snapshot:   timeline/YYYY-MM-DD-[label].yaml
    Epics:      [list]
+   Changes:    [N specs → changes/] or none
    Updated:    docs/delivery/index.md, docs/index.md
    Pruned:     [N] files from _bmad-output/ (or "skipped — KEEP_BMAD")
+```
+
+### CHANGES
+
+```
+✅ Delivery history published (CHANGES)
+   Workstream: docs/delivery/workstreams/[slug]/changes/
+   Specs:      [list of YYYY-MM-DD-<type>-<slug>.md]
+   Index:      changes/README.md
+   Pruned:     [N] spec files from _bmad-output/ (or "skipped — KEEP_BMAD")
 ```
 
 Remind: `_bmad-output/` remains gitignored — now trimmed to **living** artifacts; immutable history is in `docs/delivery/`.
@@ -333,11 +433,14 @@ When answering “how did we get here?” or planning adjacent work:
 2. Open workstream **`README.md`**
 3. Read epic **`summary.md`**
 4. Drill into **`stories/`** only when detail needed
-5. Cross-check **`docs/adr/`** for technical decisions
-6. Workstream planning snapshots: **`docs/delivery/.../planning-snapshots/`**
-7. Pre-epic spikes (no epic IDs): **`docs/planning-artifacts/`** (Option B)
+5. Check **`changes/README.md`** for non-epic bugfixes and small features in that product area (type is in the filename)
+6. Cross-check **`docs/adr/`** for technical decisions
+7. Workstream planning snapshots: **`docs/delivery/.../planning-snapshots/`**
+8. Pre-epic spikes (no epic IDs): **`docs/planning-artifacts/`** (Option B)
 
 When **`bmad-create-story`** / **`bmad-dev-story`** need prior story context for a **done** story, load from **`docs/delivery/.../stories/`**, not `_bmad-output/implementation-artifacts/`.
+
+When prior **non-epic** ship context is needed, load from **`docs/delivery/.../changes/`**, not live `spec-*.md` under `_bmad-output/`.
 
 When planning skills need prior **product/architecture/UX** context for a **closed workstream arc**, load from **`docs/delivery/.../planning-snapshots/…/planning/`**, not `_bmad-output/planning-artifacts/`.
 
@@ -346,7 +449,8 @@ When planning skills need prior **product/architecture/UX** context for a **clos
 - Replace **`log-adr`** — promote technical decisions to ADRs separately.
 - Modify `.gitignore` for `_bmad-output/` (stays ignored).
 - Run full test suites — optional sanity check only.
-- Sync ongoing BMAD edits into git — publish is **milestone-based**, not continuous.
+- Sync ongoing BMAD edits into git — publish is **milestone- or ship-based**, not continuous.
+- Auto-archive mid-branch — prefer after merge / explicit ship confirmation for CHANGES mode.
 
 ## Templates
 
@@ -354,3 +458,4 @@ When planning skills need prior **product/architecture/UX** context for a **clos
 - Workstream README: **`templates/workstream-readme.md`**
 - Delivery root README: **`templates/delivery-readme.md`**
 - Journal entry: **`templates/journal-entry.md`**
+- Changes index: **`templates/changes-readme.md`**

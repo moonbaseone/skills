@@ -21,6 +21,11 @@ See [`index.md`](./index.md) for the master list.
 
 ## Publishing
 
-Use the **`bmad-archive-history`** skill at pause points or when an epic completes. After publish, prunes duplicate artifacts from `_bmad-output/` (stories, copied retros/reviews, course-correction sources, promoted ADR drafts, UX HTML in `ux-reference/`).
+Use the **`bmad-archive-history`** skill:
 
-Rules: new files only, date-prefixed course corrections, append-only journal, never edit archived story copies in place.
+- **MILESTONE** — pause points or when an epic completes (epics, sprint-status snapshot, planning).
+- **CHANGES** — after a non-epic bugfix/feature/refactor/chore ships (`spec-*.md` → workstream `changes/`).
+
+After publish, prunes duplicate artifacts from `_bmad-output/` (stories, change specs, retros/reviews, course-correction sources, promoted ADR drafts, UX HTML in `ux-reference/`).
+
+Rules: new files only, date-prefixed course corrections and change archives (`YYYY-MM-DD-<type>-<slug>.md`), append-only journal for milestones, never edit archived copies in place.

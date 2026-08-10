@@ -16,6 +16,11 @@
 - Latest snapshot: [./timeline/YYYY-MM-DD-label.yaml](./timeline/YYYY-MM-DD-label.yaml)
 - Journal: [./timeline/journal.md](./timeline/journal.md)
 
+## Changes (non-epic)
+
+Bugfixes and other work that shipped outside epic stories: [./changes/README.md](./changes/README.md)  
+(Filenames encode type: `YYYY-MM-DD-bugfix-…`, `YYYY-MM-DD-feature-…`, etc.)
+
 ## Related
 
 - [Delivery index](../../index.md)
