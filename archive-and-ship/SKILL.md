@@ -31,13 +31,42 @@ You orchestrate a **fixed four-step pipeline** on the **active project root** (n
 
 This skill **coordinates** those flows; it does not replace their safety rules.
 
+## Branch semantics (mandatory — read first)
+
+Phrases like **“against staging”**, **“into staging”**, **“to main”**, or **`base staging`** mean the **PR merge target** (`--base`), **not** the branch you commit or push on.
+
+| Concept | Meaning | Example |
+|---------|---------|---------|
+| **Head** | Current feature branch (`git branch --show-current`) | `feat/gh-92-post-add-pool-landing` |
+| **Base** | Branch the PR merges **into** (`gh pr create --base`) | `staging` |
+
+**Correct pipeline when user says “archive-and-ship against staging”:**
+
+1. Stay on the **feature branch** (head).
+2. Archive, **commit**, and **push** on that feature branch.
+3. Open PR: **head → base** (feature branch → `staging`).
+
+**Never do any of these** unless the user explicitly asks outside this skill:
+
+- `git checkout staging` (or `main`) to commit work there
+- `git merge` the feature branch into `base` locally
+- Commit directly onto `staging`, `main`, or the repo default branch
+
+If **`HEAD` is already `staging`, `main`, or the default branch** and there are ship-worthy changes: **HALT**. Tell the user to create or switch to a feature branch, then re-run. Do not “helpfully” commit on the integration branch.
+
+Parse invoke text:
+
+- “against staging” / “into staging” / “to staging” → **`base: staging`**
+- “link to issue 92” / “issue GH-92” → **`issue: 92`**
+- Do **not** treat “against \<branch\>” as “checkout \<branch\>”.
+
 ## Invoke parameters
 
 Parse from the user's message when present; otherwise collect **before** building the plan.
 
 | Parameter | Required | Notes |
 |-----------|----------|-------|
-| **`base`** | **Yes** when opening a **new** PR | Target branch (e.g. `main`, `staging`). **Ask** if missing and no open PR exists for `HEAD`. |
+| **`base`** | **Yes** when opening a **new** PR | **PR merge target only** (e.g. `main`, `staging`). Parsed from “against staging”, “into main”, etc. **Not** the branch to commit on. |
 | **`assignee`** | No | GitHub login for `--assignee` on `gh pr create`. Omit if not provided. |
 | **`issue`** | No | Existing GitHub issue to link (`#92`, `92`, `GH-92`, `issue 92`). Verify with `gh issue view`; include `Fixes #N` in PR body unless user chose link-only wording. **Required when user asks to link the PR to an issue.** |
 | **`mode`** | No | Archive mode: `MILESTONE` (default) or `CHANGES`. Ask if `_bmad-output/` scope is ambiguous. |
@@ -65,12 +94,15 @@ Also inspect `_bmad-output/` when present to decide archive mode and scope (see 
 
 Record:
 
-- **Current branch** (`HEAD`)
+- **Head branch** (`HEAD`) — where commit and push happen; must **not** be `base`
+- **Base branch** — PR target only (from invoke or ask)
 - **Uncommitted / untracked** changes (commit step)
 - **Commits ahead of upstream** (push step)
 - **Open PR for this head?** — if **yes**, set **`pr_action: skip`** (push updates existing PR; do **not** create another)
 - **Issue to link?** — resolved number, title, URL from `gh issue view` when **`issue`** was provided
 - **Archive in scope?** — done specs, milestone boundary, or user explicitly requested archive; else **`archive_action: skip`**
+
+**HALT before planning** if `HEAD` equals **`base`**, or `HEAD` is `main` / `staging` / default branch with feature work to ship — require a feature branch first.
 
 ## PR branch rule (mandatory)
 
@@ -89,12 +121,13 @@ Build **one** proposal that merges archive plan (if any), commit message, push s
 ════════════════════════════════════════════════════════════
 ARCHIVE AND SHIP — Unified plan
 ════════════════════════════════════════════════════════════
-Branch:         [current]
+Branch (head):  [current feature branch — commit & push here]
+PR:             [head → base: <base>]
 Archive:        [SKIP | MILESTONE | CHANGES — brief scope]
 Commit:         [SKIP (clean) | proposed message + file list]
-Push:           [SKIP (up to date) | N commits to origin]
+Push:           [SKIP (up to date) | push origin/<head>]
 Pull request:   [SKIP — PR #N already open → url]
-                [CREATE → base: <base> | assignee: <login>|none | issue: #N|none | draft: yes|no]
+                [CREATE → head: <head> → base: <base> | assignee: <login>|none | issue: #N|none | draft: yes|no]
                 [title + body preview — body includes Fixes #N when issue set]
 
 Safety notes:   [sensitive paths, protected branch, lint suggestion, etc.]
@@ -129,7 +162,7 @@ If archive was **SKIP**, do nothing.
 
 ### Step 2 — Commit
 
-Follow **`git-commit`**:
+Follow **`git-commit`** on **`HEAD`** (the feature branch). **Do not** checkout or commit onto **`base`**.
 
 - Re-run `git status` / `git diff` if archive step changed the tree.
 - Stage per approved plan (usually all intended ship files, including new `docs/delivery/` paths).
@@ -140,9 +173,9 @@ If working tree is clean after archive (or archive skipped and already clean), *
 
 ### Step 3 — Push
 
-Follow **`git-push`**:
+Follow **`git-push`** on **`HEAD`** only — push the **feature branch** to `origin`. **Do not** push to **`base`**.
 
-- Refuse push from `main` / `staging` / default branch — same as **`git-push`**.
+- Refuse push when **`HEAD`** is `main` / `staging` / default branch — same as **`git-push`**.
 - `git push` or `git push -u origin <branch>` when upstream missing.
 - No separate YES/NO push confirmation — **APPROVE** already covered push.
 
@@ -167,12 +200,15 @@ Create:
 
 ```bash
 gh pr create \
+  --head "<head-branch>" \
   --base "<approved-base>" \
   --title "<approved-title>" \
   --body "<approved-body>" \
   [--draft] \
   [--assignee "<login>"]
 ```
+
+Omit `--head` only when `HEAD` is already the feature branch and `gh` defaults to it — but **never** pass **`base`** as the branch you committed on; **`--base`** is merge target only.
 
 The approved body **must** contain the issue linking line when **`issue`** was part of the plan.
 
@@ -189,7 +225,8 @@ When archive publishes a **CHANGES** spec, mention the archived path in the PR b
 
 - **Single gate:** one **APPROVE** for archive + commit + push + PR create. Never nest COMMIT/SUBMIT/APPROVE dialogs inside the same run.
 - **Existing PR:** never `gh pr create` when an open PR already targets this head branch.
-- **Base branch:** never guess for a new PR — require explicit **`base`** from invoke or user answer before showing the final plan.
+- **Base branch:** **`base`** is PR merge target only — never checkout, merge into, or commit onto **`base`**. Require explicit **`base`** from invoke (“against staging”) or user answer before showing the final plan.
+- **Head branch:** archive, commit, and push on the **current feature branch** only.
 - **Assignee:** optional; only pass `--assignee` when provided.
 - **Issue link:** when **`issue`** is set, verify the issue exists and include `Fixes #N` (or approved link-only variant) in the PR body — same rules as **`git-pr`**. Never skip linking when the user requested it.
 - **Never** force-push, amend, or rewrite history unless the user explicitly requests outside this skill's scope.

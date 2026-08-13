@@ -21,12 +21,18 @@ Parse from the user's message when present.
 
 | Parameter | Required | Notes |
 |-----------|----------|-------|
-| **`base`** | No | Target branch for merge. Default to repo primary branch; **confirm** if unsure. |
+| **`base`** | No | **PR merge target only** (e.g. `staging`, `main`). From “against staging”, “into main”. Not the branch to commit on. Default to repo primary branch; **confirm** if unsure. |
 | **`issue`** | No | Existing GitHub issue to link. Accept `#92`, `92`, `GH-92`, or `issue 92` — normalize to issue **number** `92`. Verify with `gh issue view` before create. |
 | **`assignee`** | No | GitHub login for `--assignee`. |
 | **`draft`** | No | Open as draft (`--draft`). |
 
 When the user asks to link a PR to an issue, **`issue` is required for that run** — do not skip linking silently.
+
+## Head vs base (mandatory)
+
+- **Head** = current feature branch (already pushed). **Commit and push happen here** — use **`git-commit`** / **`git-push`**, not this skill.
+- **Base** = merge target for the PR (`--base`). Phrases like “against staging” or “into main” set **`base` only**.
+- **Never** `git checkout` the base branch to land work there. If the user is on `staging`/`main` with uncommitted feature work, **HALT** — switch to a feature branch first.
 
 ## Issue linking (mandatory when requested)
 
@@ -128,6 +134,8 @@ gh pr create \
   [--draft] \
   [--assignee "<login>"]
 ```
+
+`--base` is where the PR merges **into**. The **head** is the current feature branch (must already be on `origin`). Do not checkout **`base`** to create the PR.
 
 The body **must** include `Fixes #<n>` (or approved link-only variant) when an issue link was requested.
 
