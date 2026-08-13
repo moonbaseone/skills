@@ -8,12 +8,13 @@ Shared **Cursor** and **Claude Code** skills for multiple repositories. Each ski
 |----------|-------------|
 | **`git-commit`** | Stage changes, write commit messages, create **local** commits |
 | **`git-push`** | Push commits to `origin`, set upstream, sync a branch (no PR authoring) |
-| **`git-pr`** | Create/list/view **pull requests** (e.g. `gh pr create`), title/body confirmation |
+| **`git-pr`** | Create/list/view **pull requests** (e.g. `gh pr create`), title/body confirmation; optional **`issue`** link via `Fixes #N` in body |
+| **`archive-and-ship`** | **One approval:** **`bmad-archive-history`** → **`git-commit`** → **`git-push`** → **`git-pr`**; skips PR create when a PR is already open for the branch; requires **`base`** for new PRs; optional **`assignee`** and **`issue`** link (`Fixes #N` in body) |
 | **`log-adr`** | Capture major technical decisions from chat; interactive **APPROVE/ALTER/SKIP/OTHER**; write `docs/adr/NNNN-title.md` and update `docs/adr/index.md` |
 | **`bmad-archive-history`** | Archive gitignored `_bmad-output/` into `docs/delivery/` at milestones; Option B routing (`docs/planning-artifacts/` = pre-epic spikes only); conflict-minimal workstream folders |
 | **`manual-review`** | Paired human–AI walkthrough of AI-generated code in gated, bite-size chunks; complements automated review (e.g. `bmad-code-review`); writes a review record to `docs/reviews/` |
 
-**Routing:** Point agents (or a Cursor rule) so “commit / stage / message” loads **`git-commit`**, “push / publish branch” loads **`git-push`**, “open a PR / review request” loads **`git-pr`**, “ADR / decision log / record architecture decision” loads **`log-adr`**, “archive BMAD history / snapshot epic / publish delivery history” loads **`bmad-archive-history`**, “manual review / walk me through the code / paired review” loads **`manual-review`**.
+**Routing:** Point agents (or a Cursor rule) so “commit / stage / message” loads **`git-commit`**, “push / publish branch” loads **`git-push`**, “open a PR / review request” loads **`git-pr`**, “archive and ship / ship my change / publish and open PR” loads **`archive-and-ship`**, “ADR / decision log / record architecture decision” loads **`log-adr`**, “archive BMAD history / snapshot epic / publish delivery history” loads **`bmad-archive-history`**, “manual review / walk me through the code / paired review” loads **`manual-review`**.
 
 ## Layout (this repository)
 
@@ -24,6 +25,8 @@ git-commit/
 git-push/
   SKILL.md
 git-pr/
+  SKILL.md
+archive-and-ship/
   SKILL.md
 log-adr/
   SKILL.md

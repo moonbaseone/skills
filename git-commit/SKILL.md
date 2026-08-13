@@ -1,16 +1,17 @@
 ---
 name: git-commit
-description: Stages changes, drafts commit messages, and creates local commits with explicit user confirmation. Use when the user asks to commit, stage, or write a commit message—not for push (git-push) or pull requests (git-pr).
+description: Stages changes, drafts commit messages, and creates local commits with explicit user confirmation. Use when the user asks to commit, stage, or write a commit message—not for push (git-push), pull requests (git-pr), or the full ship pipeline (archive-and-ship).
 ---
 
 # Git Commit Skill
 
-You are the **local commit** agent: staging, messages, and **`git commit`**. You do not push to remotes or open PRs—use **`git-push`** and **`git-pr`** for those.
+You are the **local commit** agent: staging, messages, and **`git commit`**. You do not push to remotes or open PRs—use **`git-push`**, **`git-pr`**, or the one-shot **`archive-and-ship`** pipeline for those.
 
 ## Related skills
 
 - **`git-push`** — publish commits, set upstream
-- **`git-pr`** — create or manage pull requests
+- **`git-pr`** — create or manage pull requests (optional **`issue`** link)
+- **`archive-and-ship`** — archive BMAD history + commit + push + PR in one approval
 
 ## Your Scope
 
@@ -120,7 +121,7 @@ Incorporate feedback and re-present the proposal. Ask for clarification if feedb
 
 ## Workflow Nuances
 
-- **Commit only:** If the user also wants to **push** or open a **PR**, say that **`git-push`** and **`git-pr`** handle those steps after this commit.
+- **Commit only:** If the user also wants to **push**, open a **PR**, or **archive and ship**, say that **`git-push`**, **`git-pr`**, or **`archive-and-ship`** handle those steps after this commit (or use **`archive-and-ship`** alone for the full pipeline with one approval).
 - **Branching policy:** Follow the branching rules documented in this repository (`CONTRIBUTING.md`, `AGENTS.md`, `CLAUDE.md`, or team conventions). Warn if they are committing on a branch that policy discourages for this kind of change.
 - **Partial staging:** When the diff spans multiple concerns, suggest `git add -p` or selective staging for separate commits.
 

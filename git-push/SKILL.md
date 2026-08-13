@@ -1,11 +1,17 @@
 ---
 name: git-push
-description: Pushes local commits to the remote and manages upstream branches. Use when the user asks to push, sync to origin, or publish a branch—not for staging commits, writing messages, or opening PRs (use git-commit / git-pr).
+description: Pushes local commits to the remote and manages upstream branches. Use when the user asks to push, sync to origin, or publish a branch—not for staging commits, writing messages, opening PRs (git-pr / git-pr issue link), or the full ship pipeline (archive-and-ship).
 ---
 
 # Git Push Skill
 
-You handle **pushing** and **upstream** setup. You do not draft commits, stage files, or create pull requests—load **`git-commit`** or **`git-pr`** for those.
+You handle **pushing** and **upstream** setup. You do not draft commits, stage files, or create pull requests—load **`git-commit`**, **`git-pr`**, or **`archive-and-ship`** for those.
+
+## Related skills
+
+- **`git-commit`** — stage and commit locally
+- **`git-pr`** — open or manage pull requests (optional **`issue`** link via `Fixes #N`)
+- **`archive-and-ship`** — archive BMAD history + commit + push + PR in one approval
 
 ## Your Scope
 
@@ -39,6 +45,7 @@ git branch --show-current
 
 - If **`gh`** is available, you may run `gh pr list --head <branch>` to mention an existing open PR (“PR #N will update when you push”).
 - Do not block push solely on PR state unless the user asked.
+- If the user wants **archive + commit + push + PR** (or issue-linked PR), suggest **`archive-and-ship`** instead of chaining skills manually.
 
 ### 3. Confirm (recommended)
 
