@@ -19,7 +19,7 @@
 ## Changes (non-epic)
 
 Bugfixes and other work that shipped outside epic stories: [./changes/README.md](./changes/README.md)  
-(Filenames encode type: `YYYY-MM-DD-bugfix-…`, `YYYY-MM-DD-feature-…`, etc.)
+(Names encode type: `YYYY-MM-DD-bugfix-….md` for `bmad-build` one-shots, or a same-named folder for a `bmad-spec` kernel.)
 
 ## Related
 

@@ -90,7 +90,22 @@ gh pr list --head "$(git branch --show-current)" --state open --json number,url,
 gh issue view <number> --json number,title,state,url
 ```
 
-Also inspect `_bmad-output/` when present to decide archive mode and scope (see **`bmad-archive-history`**).
+Also inspect `_bmad-output/` when present to decide archive mode and scope (see **`bmad-archive-history`**). **CHANGES / one-shots are not implementation-artifacts-only** — scan **both** folders:
+
+| Folder | What to look for |
+|--------|------------------|
+| `_bmad-output/implementation-artifacts/` | Done `spec-*.md` (and other done change specs) |
+| `_bmad-output/planning-artifacts/` | Files **related to this change** from planning skills (UX design spec, design-directions HTML, mockups, issue-scoped notes) |
+
+**Never archive or prune** project-wide living files in `planning-artifacts/` — they are not issue-scoped:
+
+- `coding-standards.md`
+- `code_review_practices.md`
+- `epics.md`
+- `README.md` (folder index)
+- Any other file that is project-wide and not tied to the specific issue/change being shipped
+
+Related planning files ship with the change (UX → workstream `ux-reference/`; rename generic BMAD defaults with the change slug). List every candidate in the unified plan — do not silently skip. Full routing is in **`bmad-archive-history`** CHANGES.
 
 Record:
 
@@ -100,7 +115,7 @@ Record:
 - **Commits ahead of upstream** (push step)
 - **Open PR for this head?** — if **yes**, set **`pr_action: skip`** (push updates existing PR; do **not** create another)
 - **Issue to link?** — resolved number, title, URL from `gh issue view` when **`issue`** was provided
-- **Archive in scope?** — done specs, milestone boundary, or user explicitly requested archive; else **`archive_action: skip`**
+- **Archive in scope?** — done specs, **related** `planning-artifacts/` files, milestone boundary, or user explicitly requested archive; else **`archive_action: skip`**
 
 **HALT before planning** if `HEAD` equals **`base`**, or `HEAD` is `main` / `staging` / default branch with feature work to ship — require a feature branch first.
 
@@ -123,7 +138,7 @@ ARCHIVE AND SHIP — Unified plan
 ════════════════════════════════════════════════════════════
 Branch (head):  [current feature branch — commit & push here]
 PR:             [head → base: <base>]
-Archive:        [SKIP | MILESTONE | CHANGES — brief scope]
+Archive:        [SKIP | MILESTONE | CHANGES — specs + related planning files (not coding-standards / code_review_practices / epics.md)]
 Commit:         [SKIP (clean) | proposed message + file list]
 Push:           [SKIP (up to date) | push origin/<head>]
 Pull request:   [SKIP — PR #N already open → url]
@@ -156,6 +171,7 @@ Follow **`bmad-archive-history`** for the approved mode and scope:
 
 - Write under `docs/delivery/` (and Option B paths only when that skill routes there).
 - Use templates from **`bmad-archive-history/templates/`** when creating skeleton files.
+- For **CHANGES**, archive related `_bmad-output/planning-artifacts/` files with the spec (see that skill). **Do not** prune `coding-standards.md`, `code_review_practices.md`, `epics.md`, or other project-wide living files.
 - Prune `_bmad-output/` per approved plan unless user chose **KEEP_BMAD** in an ALTER.
 
 If archive was **SKIP**, do nothing.
@@ -219,7 +235,7 @@ Use **network** / **git_write** permissions as the environment requires.
 - **Commit message:** derive from full diff (archive docs + app code). Prefer conventional commits; one cohesive commit unless the user **ALTER**ed to split ( splitting is rare in this skill — prefer single ship commit).
 - **PR title/body:** summarize the **entire** branch intent, not only the last commit. Include archive/publish note when step 1 ran. Adapt checklist to project (`CONTRIBUTING.md`, `CLAUDE.md`).
 
-When archive publishes a **CHANGES** spec, mention the archived path in the PR body.
+When archive publishes a **CHANGES** spec, mention the archived path in the PR body (and related `ux-reference/` files when those shipped with it).
 
 ## Rules
 
