@@ -2,7 +2,10 @@
 
 Immutable copies of **done** change specs that shipped outside the epic/story tree (bugfixes, small features, refactors, chores). Live BMAD copies are pruned from `_bmad-output/` after publish.
 
-**Filename convention:** `YYYY-MM-DD-<type>-<slug>.md` where `<type>` is `feature` | `bugfix` | `refactor` | `chore` from the spec frontmatter.
+**Naming:** `<type>` is `feature` | `bugfix` | `refactor` | `chore`.
+
+- `bmad-build` one-shot: `YYYY-MM-DD-<type>-<slug>.md`
+- `bmad-spec` folder: `YYYY-MM-DD-<type>-<slug>/` (`SPEC.md` + companions + `.memlog.md`)
 
 | Date | Type | Title | Spec | Issue / PR |
 |------|------|-------|------|------------|
