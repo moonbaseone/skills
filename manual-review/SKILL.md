@@ -158,7 +158,7 @@ When the last chunk closes:
 
 A markdown file created at intake from **`templates/session-state.md`** (in this skill directory), updated as each chunk closes.
 
-- **Location:** **`docs/reviews/`** in the target project root, named `YYYY-MM-DD-<slug>.md` (slug from the story or change description). If the project layout makes this location doubtful, ask the user where review records live.
+- **Location:** **`docs/delivery/changes/YYYY-MM-DD-review-<slug>.md`** in the target project root (slug from the story or change description). When the review is of an epic story, prefer that epic’s `reviews/` folder instead. If the project layout makes this location doubtful, ask the user where review records live.
 - **Contents:** scope, requirement artifact, full chunk plan with statuses, per-chunk file purposes, changes made during review, parking lot, deferred items.
 - It is both the **resume point** ("continue the manual review" in a fresh session) and, once finalized, the **wrap-up record** that supports the accountability goal.
 - **Never include it in the review scope** — it will show up as an uncommitted change during the session; ignore it when chunking.

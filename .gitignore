@@ -1,2 +1,6 @@
 # Cursor IDE local state
 .cursor/
+
+# Local secrets
+.envrc
+.direnv/

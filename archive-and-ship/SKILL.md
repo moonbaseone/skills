@@ -70,7 +70,7 @@ Parse from the user's message when present; otherwise collect **before** buildin
 | **`assignee`** | No | GitHub login for `--assignee` on `gh pr create`. Omit if not provided. |
 | **`issue`** | No | Existing GitHub issue to link (`#92`, `92`, `GH-92`, `issue 92`). Verify with `gh issue view`; include `Fixes #N` in PR body unless user chose link-only wording. **Required when user asks to link the PR to an issue.** |
 | **`mode`** | No | Archive mode: `MILESTONE` (default) or `CHANGES`. Ask if `_bmad-output/` scope is ambiguous. |
-| **`workstream`** | No | Workstream slug for archive; infer or ask if archive step has material to publish. |
+| **`workstream`** | — | Unused. Delivery is flat under `docs/delivery/`; do not ask for a slug. |
 | **`draft`** | No | Open new PR as draft (`--draft`). Default: ready for review unless user says draft. |
 
 **Do not** proceed to the unified plan without **`base`** when the PR step will create a new PR.
@@ -100,12 +100,12 @@ Also inspect `_bmad-output/` when present to decide archive mode and scope (see 
 **Never archive or prune** project-wide living files in `planning-artifacts/` — they are not issue-scoped:
 
 - `coding-standards.md`
-- `code_review_practices.md`
+- `code-reviews.md`
 - `epics.md`
 - `README.md` (folder index)
 - Any other file that is project-wide and not tied to the specific issue/change being shipped
 
-Related planning files ship with the change (UX → workstream `ux-reference/`; rename generic BMAD defaults with the change slug). List every candidate in the unified plan — do not silently skip. Full routing is in **`bmad-archive-history`** CHANGES.
+Related planning files ship with the change (UX → `docs/delivery/ux-reference/`; rename generic BMAD defaults with the change slug). List every candidate in the unified plan — do not silently skip. Full routing is in **`bmad-archive-history`** CHANGES.
 
 Record:
 
@@ -138,7 +138,7 @@ ARCHIVE AND SHIP — Unified plan
 ════════════════════════════════════════════════════════════
 Branch (head):  [current feature branch — commit & push here]
 PR:             [head → base: <base>]
-Archive:        [SKIP | MILESTONE | CHANGES — specs + related planning files (not coding-standards / code_review_practices / epics.md)]
+Archive:        [SKIP | MILESTONE | CHANGES — specs + related planning files (not coding-standards / code-reviews / epics.md)]
 Commit:         [SKIP (clean) | proposed message + file list]
 Push:           [SKIP (up to date) | push origin/<head>]
 Pull request:   [SKIP — PR #N already open → url]
@@ -169,9 +169,9 @@ Execute strictly in order. If a step is **SKIP** in the approved plan, continue 
 
 Follow **`bmad-archive-history`** for the approved mode and scope:
 
-- Write under `docs/delivery/` (and Option B paths only when that skill routes there).
+- Write under `docs/delivery/` (unbuilt spikes stay in `_bmad-output/planning-artifacts/`).
 - Use templates from **`bmad-archive-history/templates/`** when creating skeleton files.
-- For **CHANGES**, archive related `_bmad-output/planning-artifacts/` files with the spec (see that skill). **Do not** prune `coding-standards.md`, `code_review_practices.md`, `epics.md`, or other project-wide living files.
+- For **CHANGES**, archive related `_bmad-output/planning-artifacts/` files with the spec (see that skill). **Do not** prune `coding-standards.md`, `code-reviews.md`, `epics.md`, or other project-wide living files.
 - Prune `_bmad-output/` per approved plan unless user chose **KEEP_BMAD** in an ALTER.
 
 If archive was **SKIP**, do nothing.
