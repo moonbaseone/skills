@@ -1,5 +1,5 @@
 {
-  "name": "@wookosh/agent-skills",
+  "name": "@moonbaseone/agent-skills",
   "private": true,
   "type": "module",
   "description": "Shared Cursor and Claude Code agent skills",

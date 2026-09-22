@@ -14,8 +14,9 @@ Shared **Cursor** and **Claude Code** skills for multiple repositories. Each ski
 | **`bmad-archive-history`** | Archive gitignored `_bmad-output/` into `docs/delivery/` at milestones (BMAD 6.11 spec folders + UX/PRD/architecture run folders; leftover 6.3 flats still scan); unbuilt spikes stay in `_bmad-output/`; flat `epics/` + `changes/` |
 | **`manual-review`** | Paired human–AI walkthrough of AI-generated code in gated, bite-size chunks; complements automated review (e.g. `bmad-code-review`); writes a review record to `docs/delivery/changes/YYYY-MM-DD-review-<slug>.md` |
 | **`technical-writer`** | Keep `docs/reference/` honest against the app; keep root `README.md` a human getting-started guide (no reference dump, no `CLAUDE.md` agent-harness essay) |
+| **`devenv`** | Drive the `devenv` developer-environment tool (solution-template): per-worktree Supabase environments (cloud branch / local stack), `create`/`down`/`sweep`, MCP servers that follow the worktree, the grants wizard — flag forms and recipes so an agent never reads the full docs |
 
-**Routing:** Point agents (or a Cursor rule) so “commit / stage / message” loads **`git-commit`**, “push / publish branch” loads **`git-push`**, “open a PR / review request” loads **`git-pr`**, “archive and ship / ship my change / publish and open PR” loads **`archive-and-ship`**, “ADR / decision log / record architecture decision” loads **`log-adr`**, “archive BMAD history / snapshot epic / publish delivery history” loads **`bmad-archive-history`**, “manual review / walk me through the code / paired review” loads **`manual-review`**, “update docs/reference / refresh the README / audit product notes against the app” loads **`technical-writer`**.
+**Routing:** Point agents (or a Cursor rule) so “commit / stage / message” loads **`git-commit`**, “push / publish branch” loads **`git-push`**, “open a PR / review request” loads **`git-pr`**, “archive and ship / ship my change / publish and open PR” loads **`archive-and-ship`**, “ADR / decision log / record architecture decision” loads **`log-adr`**, “archive BMAD history / snapshot epic / publish delivery history” loads **`bmad-archive-history`**, “manual review / walk me through the code / paired review” loads **`manual-review`**, “update docs/reference / refresh the README / audit product notes against the app” loads **`technical-writer`**, “devenv / new worktree / isolated environment / local stack / cloud branch / grant a role or feature flag to the dev user” loads **`devenv`**.
 
 ## Layout (this repository)
 
@@ -47,6 +48,9 @@ manual-review/
   templates/
     session-state.md
 technical-writer/
+  SKILL.md
+devenv/
+  SKILL.md
   SKILL.md
 ```
 
