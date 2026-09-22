@@ -13,8 +13,9 @@ Shared **Cursor** and **Claude Code** skills for multiple repositories. Each ski
 | **`log-adr`** | Capture major technical decisions from chat; interactive **APPROVE/ALTER/SKIP/OTHER**; write `docs/adr/NNNN-title.md` and update `docs/adr/index.md` |
 | **`bmad-archive-history`** | Archive gitignored `_bmad-output/` into `docs/delivery/` at milestones (BMAD 6.11 spec folders + UX/PRD/architecture run folders; leftover 6.3 flats still scan); Option B routing (`docs/planning-artifacts/` = pre-epic spikes only); conflict-minimal workstream folders |
 | **`manual-review`** | Paired human–AI walkthrough of AI-generated code in gated, bite-size chunks; complements automated review (e.g. `bmad-code-review`); writes a review record to `docs/reviews/` |
+| **`devenv`** | Drive the `devenv` developer-environment tool (solution-template): per-worktree Supabase environments (cloud branch / local stack), `create`/`down`/`sweep`, MCP servers that follow the worktree, the grants wizard — flag forms and recipes so an agent never reads the full docs |
 
-**Routing:** Point agents (or a Cursor rule) so “commit / stage / message” loads **`git-commit`**, “push / publish branch” loads **`git-push`**, “open a PR / review request” loads **`git-pr`**, “archive and ship / ship my change / publish and open PR” loads **`archive-and-ship`**, “ADR / decision log / record architecture decision” loads **`log-adr`**, “archive BMAD history / snapshot epic / publish delivery history” loads **`bmad-archive-history`**, “manual review / walk me through the code / paired review” loads **`manual-review`**.
+**Routing:** Point agents (or a Cursor rule) so “commit / stage / message” loads **`git-commit`**, “push / publish branch” loads **`git-push`**, “open a PR / review request” loads **`git-pr`**, “archive and ship / ship my change / publish and open PR” loads **`archive-and-ship`**, “ADR / decision log / record architecture decision” loads **`log-adr`**, “archive BMAD history / snapshot epic / publish delivery history” loads **`bmad-archive-history`**, “manual review / walk me through the code / paired review” loads **`manual-review`**, “devenv / new worktree / isolated environment / local stack / cloud branch / grant a role or feature flag to the dev user” loads **`devenv`**.
 
 ## Layout (this repository)
 
@@ -43,6 +44,8 @@ manual-review/
   SKILL.md
   templates/
     session-state.md
+devenv/
+  SKILL.md
 ```
 
 Add more skills by adding sibling folders with their own `SKILL.md` and YAML frontmatter (`name`, `description`).
