@@ -1,7 +1,6 @@
 # Epic [N] — [Title]
 
 **Status:** done (archived YYYY-MM-DD)  
-**Workstream:** [workstream-slug]  
 **FRs:** [FR list or “see epics-excerpt”]  
 **ADRs:** [relative links to docs/adr/ if any]
 

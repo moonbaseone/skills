@@ -9,22 +9,19 @@ Published **milestone snapshots** of BMAD planning and implementation work. Answ
 | **Active BMAD workspace** | `_bmad-output/` | gitignored — per developer |
 | **Published history** | `docs/delivery/` | committed — immutable at publish time |
 | **Technical decisions** | `docs/adr/` | committed |
-| **Pre-epic spikes (Option B)** | `docs/planning-artifacts/` | committed — no epic/story IDs yet |
+| **Current product notes** | `docs/reference/` | committed — maintained |
+| **Unbuilt spikes** | `_bmad-output/planning-artifacts/` | gitignored until the work ships |
 
-Do **not** expect `sprint-status.yaml` or living `epics.md` in git. Snapshots live under each workstream’s `timeline/`.
+Do **not** expect `sprint-status.yaml` or living `epics.md` in git. Snapshots live under [`timeline/`](./timeline/).
 
-## Workstreams
-
-Product-area folders under [`workstreams/`](./workstreams/). Each developer publishes their stream at epic boundaries without editing others’ folders.
-
-See [`index.md`](./index.md) for the master list.
+See [`index.md`](./index.md) for the epic list.
 
 ## Publishing
 
 Use the **`bmad-archive-history`** skill:
 
 - **MILESTONE** — pause points or when an epic completes (epics, sprint-status snapshot, planning).
-- **CHANGES** — after a non-epic bugfix/feature/refactor/chore ships (`spec-*.md` and/or `specs/spec-{slug}/` → workstream `changes/`).
+- **CHANGES** — after a non-epic bugfix/feature/refactor/chore ships (`spec-*.md` and/or `specs/spec-{slug}/` → `docs/delivery/changes/`).
 
 After publish, prunes duplicate artifacts from `_bmad-output/` (stories, change specs and spec folders, retros/reviews, course-correction sources, promoted ADR drafts, UX run folders in `ux-reference/`).
 
