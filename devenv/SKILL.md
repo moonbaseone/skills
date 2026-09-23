@@ -34,6 +34,11 @@ tool exit non-zero **naming the flag** — it never hangs. `--help` prints the f
 - Ownership: an environment whose `<devname>-` prefix is not yours is only touched with
   `--not-mine`. **`--yes` never implies `--not-mine`.**
 - Prod and staging are never a target; the tool refuses any parent that is not the dev project.
+- The app's settings are data in `apps/backend/config/devenv.json` (project, dev parent ref,
+  required base-env keys, next steps) plus a grants module it names (the capabilities). When that
+  file declares a secret the base env lacks, `up` without a terminal exits 1 with
+  `missing required base-env keys: <keys> — run \`devenv setup\` in a terminal`: **stop and ask the
+  human** to run `pnpm run devenv setup` (or `up`) in a terminal — never write a value yourself.
 
 ## Actions
 
@@ -102,6 +107,7 @@ worktree path, ports, branch/ref, and every file it would write.
 | Supabase token (PAT, mode 0600) | `~/.supabase/access-token` (`SUPABASE_ACCESS_TOKEN` overrides) |
 | Local stack workdir (gitignored) | `apps/backend/.devenv/<name>/supabase/config.toml` |
 | Generated env files (gitignored) | `apps/backend/config/.env`, `apps/backend/config/.env.test`, `apps/frontend/.env` |
+| The app's devenv settings (committed) | `apps/backend/config/devenv.json` + the grants module its `grants.module` names |
 
 ## Do not
 
@@ -121,4 +127,5 @@ Capability ids for `grants` (run `grants --list` to confirm): `login`, `regulati
 `shape-designer`, `teams`, `team-org`, `all-login-methods`. Required base-env keys:
 `GOOGLE_MAPS_API_KEY`, `SUPABASE_AUTH_SMTP_PASS`. MCP entries in `.mcp.json` / `.cursor/mcp.json`:
 `supabase-db` (Postgres of this worktree's environment) and `supabase-dev` (Supabase Management API,
-read-only). Dev parent: the `aquatic-dev` project (`SUPABASE_PARENT_REF` in `config/.env.example`).
+read-only). Dev parent: the `aquatic-dev` project (`parentProjectRef` in
+`apps/backend/config/devenv.json`); capabilities live in `apps/backend/scripts/devenvGrants.ts`.
