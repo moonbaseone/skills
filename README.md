@@ -15,8 +15,9 @@ Shared **Cursor** and **Claude Code** skills for multiple repositories. Each ski
 | **`manual-review`** | Paired human–AI walkthrough of AI-generated code in gated, bite-size chunks; complements automated review (e.g. `bmad-code-review`); writes a review record to `docs/delivery/changes/YYYY-MM-DD-review-<slug>.md` |
 | **`technical-writer`** | Keep `docs/reference/` honest against the app; keep root `README.md` a human getting-started guide (no reference dump, no `CLAUDE.md` agent-harness essay) |
 | **`devenv`** | Drive the `devenv` developer-environment tool (solution-template): per-worktree Supabase environments (cloud branch / local stack), `create`/`down`/`sweep`, MCP servers that follow the worktree, the grants wizard — flag forms and recipes so an agent never reads the full docs |
+| **`story-estimates`** | One table of an epic's stories — description, complexity (story points), files / ±lines, recommended model (Sonnet / Opus / Fable), dependencies, status — full list or what's left. `stories.mjs` does the bookkeeping and rendering; parallel Sonnet subagents estimate only new or changed stories (≤ 2 min first run, ≤ 30 s after); estimates stored beside the story file |
 
-**Routing:** Point agents (or a Cursor rule) so “commit / stage / message” loads **`git-commit`**, “push / publish branch” loads **`git-push`**, “open a PR / review request” loads **`git-pr`**, “archive and ship / ship my change / publish and open PR” loads **`archive-and-ship`**, “ADR / decision log / record architecture decision” loads **`log-adr`**, “archive BMAD history / snapshot epic / publish delivery history” loads **`bmad-archive-history`**, “manual review / walk me through the code / paired review” loads **`manual-review`**, “update docs/reference / refresh the README / audit product notes against the app” loads **`technical-writer`**, “devenv / new worktree / isolated environment / local stack / cloud branch / grant a role or feature flag to the dev user” loads **`devenv`**.
+**Routing:** Point agents (or a Cursor rule) so “commit / stage / message” loads **`git-commit`**, “push / publish branch” loads **`git-push`**, “open a PR / review request” loads **`git-pr`**, “archive and ship / ship my change / publish and open PR” loads **`archive-and-ship`**, “ADR / decision log / record architecture decision” loads **`log-adr`**, “archive BMAD history / snapshot epic / publish delivery history” loads **`bmad-archive-history`**, “manual review / walk me through the code / paired review” loads **`manual-review`**, “update docs/reference / refresh the README / audit product notes against the app” loads **`technical-writer`**, “devenv / new worktree / isolated environment / local stack / cloud branch / grant a role or feature flag to the dev user” loads **`devenv`**, “story table / what's left / story points / which model per story” loads **`story-estimates`**.
 
 ## Layout (this repository)
 
@@ -52,6 +53,10 @@ technical-writer/
 devenv/
   SKILL.md
   SKILL.md
+story-estimates/
+  SKILL.md
+  estimating.md         # read by the estimating subagents only
+  stories.mjs           # story discovery, status, stored estimates, table rendering
 ```
 
 Add more skills by adding sibling folders with their own `SKILL.md` and YAML frontmatter (`name`, `description`).
